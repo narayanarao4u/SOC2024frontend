@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-2xl font-bold;
+  }
+  h2 {
+    @apply text-xl font-semibold;
+  }
+  input,
+  select {
+    @apply border border-gray-300 rounded px-2 py-1;
+  }
+  label {
+    @apply font-semibold px-1;
+  }
+
+  button {
+    @apply border border-gray-500 rounded px-2 py-1;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded;
+  }
+
+  .test-box {
+    @apply border border-gray-500 rounded p-1;
+  }
+}

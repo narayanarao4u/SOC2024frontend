@@ -1,0 +1,39 @@
+.selected {
+  background-color: #f0f0f0;
+  font-weight: bold;
+  position: sticky;
+  /* top: 0; */
+}
+.customSelectTable {
+  position: absolute;
+  z-index: 99;
+  background-color: wheat;
+  height: 200px;
+  overflow: auto;
+}
+
+table,
+tr,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.customSelectTable tr {
+  cursor: pointer;
+}
+
+.customSelectTable th {
+  cursor: pointer;
+  background-color: slateblue;
+  color: wheat;
+}
+
+.customSelectTable td {
+  padding: 2px 10px;
+}
+
+.customSelectTable tr:hover {
+  border: 1px solid black;
+}

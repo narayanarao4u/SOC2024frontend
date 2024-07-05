@@ -7,6 +7,7 @@ const Home = () => {
   const SelectedAC = useSelector(state => state.acdata.selected);
 
   const memdata = useSelector(state => state.memdata.data);
+  
   return (
     <Card>
       <section>

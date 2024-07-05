@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async (url) => {
+  console.log('memdata' , url);
   const response = await axios.get(url);
   return response.data;
 });
@@ -22,7 +23,7 @@ export const deletePost = createAsyncThunk("posts/deletePost", async ({ url, id 
 });
 
 const initialState =  {
-  data: [],
+  members: [],
   status: "idle",
   error: null,
   selected: null,
@@ -36,7 +37,7 @@ const memdataSlice = createSlice({
       state.selected = action.payload;      
     },
     filterPosts: (state, action) => {      
-      state.data = action.payload;
+      state.members = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -46,23 +47,23 @@ const memdataSlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.data = action.payload;
+        state.members = action.payload;
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
       })
       .addCase(createPost.fulfilled, (state, action) => {
-        state.data.push(action.payload);
+        state.members.push(action.payload);
       })
       .addCase(updatePost.fulfilled, (state, action) => {
-        const index = state.data.findIndex((post) => post.id === action.payload.id);
+        const index = state.members.findIndex((post) => post.id === action.payload.id);
         if (index !== -1) {
-          state.data[index] = action.payload;
+          state.members[index] = action.payload;
         }
       })
       .addCase(deletePost.fulfilled, (state, action) => {
-        state.data = state.data.filter((post) => post.id !== action.payload);
+        state.members = state.members.filter((post) => post.id !== action.payload);
       });
   },
 });

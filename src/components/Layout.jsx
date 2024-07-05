@@ -3,11 +3,11 @@ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import Home from './Home';
-// import MemberData from './MemberData';
-// import  ACData from './ACData';
+import MemberData from './MemberData';
+import  ACData from './ACData';
 
-const MemberData = lazy(() => import('./MemberData'));
-const ACData = lazy(() => import('./ACData'));
+// const MemberData = lazy(() => import('./MemberData'));
+// const ACData = lazy(() => import('./ACData'));
 
 function Layout() {
   return (
@@ -15,14 +15,13 @@ function Layout() {
       <Routes>
         <Route element={<RouterLayout />} >
           <Route index path="/" element={<Home />} />
-          <Route path="/members" element={
-              <Suspense fallback={<div>Loading...</div>}>
-                <MemberData />
-              </Suspense>} />
-          <Route path="/accounts" element={
+          <Route path="/members" element={  <MemberData />} />
+          <Route path="/accounts" element={  <ACData />} />
+            
+          {/* <Route path="/accounts" element={
               <Suspense fallback={<div>Loading...</div>}>
                 <ACData />
-              </Suspense>} />
+              </Suspense>} /> */}
         </Route>
       </Routes>
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPosts, createPost, updatePost, deletePost } from '../redux/accountSlice';
 import moment from 'moment'
+import DisplayData from './common/DisplayData';
 
 const ACData = () => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const ACData = () => {
   const status = useSelector(state => state.acdata.status);
   const error = useSelector(state => state.acdata.error);
 
-  const url = `http://localhost:3005/api/member`;
+  const url = `http://localhost:3005/api/AC_tb`;
   // const [editPost, setEditPost] = useState(null);
   const editPost = useSelector(state => state.acdata.selected);
   const [searchText, setSearchText] = useState('');
@@ -110,16 +111,15 @@ const ACData = () => {
 
 
 
-      <h2>Posts</h2>
-      {data.map(x => (
-        <div key={x.id} className='grid grid-cols-5 gap-2'>
-          <div>{x.name}</div>
-          <div>{x.desgn}</div>
-          <div>{moment(x.DOB).format('DD-MM-YYYY')}</div>  
-          <button onClick={() => handleEdit(x)}>Edit</button>
-          <button onClick={() => handleDelete(x.id)}>Delete</button>
-        </div>
-      ))}
+        <h2>Account Details</h2>
+        <DisplayData data={data} 
+        handleEdit={handleEdit} 
+        handleDelete={handleDelete}
+        dispcols={['id', 'AC Type']}
+        cols =   {['id', 'AC_type']}
+         />
+
+      
     </div>
   );
 };

@@ -22,6 +22,7 @@ const ACData = () => {
     if (url && status === 'idle') {
       dispatch(fetchPosts(url));
     }
+    console.log('firedddd');
   }, [url, status, dispatch]);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ const ACData = () => {
     let frm = new FormData(e.target);
     let frmdata = Object.fromEntries(frm);
     console.log('frmdata', frmdata);
+
 
     if (frmdata.id) {
       dispatch(updatePost({ url, id: frmdata.id, data: frmdata }));
@@ -88,11 +90,16 @@ const ACData = () => {
 
       <div>
         <form onSubmit={handleSubmit} ref={frm}>
-          <label> {editPost?.id} </label>
-          <CustomInput disp="Designation" name="desgn" defval={editPost?.desgn} />
-          <CustomInput disp="Employe Name" name="desgn" defval={editPost?.name} />
-          <input type="date" name='DOB' placeholder="Enter DOB" 
-            defaultValue={moment(editPost?.DOB).format('YYYY-MM-DD')} />
+          <input type="hidden" name="id" defaultValue={editPost?.id} />
+
+          <label htmlFor="Name">Name</label>
+          <input type="text" name="name" id="name" defaultValue={editPost?.name}  required/>
+
+          <label htmlFor="degn">Designation</label>
+          <input type="text" name="desgn" id="desgn" defaultValue={editPost?.desgn} required/>
+
+          {/* <input type="date" name='DOB' placeholder="Enter DOB" 
+            defaultValue={moment(editPost?.DOB).format('YYYY-MM-DD')} /> */}
           {/* <input type="text" name='desgn' placeholder="desgn" defaultValue={editPost?.desgn} /> */}
           <button type="submit"> {editPost ? 'Update' : 'Create'} </button>
           <button onClick={() => setEditPost(null)} type='reset' > Cancel</button>

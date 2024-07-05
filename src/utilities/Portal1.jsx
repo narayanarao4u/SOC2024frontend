@@ -5,9 +5,7 @@ function Portal1({children, isOpen, onClose}) {
 
   useEffect(() => { 
     function hanlder(e) {            
-        if(e.key === 'Escape') onClose()
-
-          console.log('key pressed', e.key);
+        if(e.key === 'Escape') onClose()         
     }
     
     document.addEventListener('keydown', hanlder);

@@ -10,11 +10,14 @@ import moment from 'moment'
 import styled from 'styled-components';
 import Portal1 from '../utilities/Portal1';
 
+import { dtFields   } from '../services/common.js';
+
 const MemberData = () => {
   const dispatch = useDispatch();
   const memdata = useSelector(state => state.memdata.data);
   const status = useSelector(state => state.memdata.status);
   const error = useSelector(state => state.memdata.error);
+  const [data, setData] = useState([]);
 
   const url = `http://localhost:3005/api/member`;
   // const [editPost, setEditPost] = useState(null);
@@ -35,18 +38,11 @@ const MemberData = () => {
     if (url && status === 'idle') {
       dispatch(fetchPosts(url));
     }
+  
+    setData(memdata);
   }, [url, status, dispatch]);
 
-  useEffect(() => {
-    // if (memdata) {
-    //   setData(memdata);
-    // }
 
-
-
-
-
-  }, [memdata]);
 
   //how to filter the data 
 
@@ -56,8 +52,12 @@ const MemberData = () => {
     e.preventDefault();
     let frm = new FormData(e.target);
     let frmdata = Object.fromEntries(frm);
-    frmdata.DOB = new Date(frmdata.DOB);
-    console.log('frmdata', frmdata);
+
+    Object.keys(frmdata).forEach((key ) => {
+     
+      if( dtFields.includes(key) ) frmdata[key] =new Date((frmdata[key]));
+    })
+    
 
     if (frmdata.id) {
       dispatch(updatePost({ url, id: frmdata.id, data: frmdata }));
@@ -89,6 +89,7 @@ const MemberData = () => {
   return (
     <div className='px-4'>
       <h2>Member Data</h2>
+ 
 
 
       <Portal1 isOpen={isOpen} onClose={onClose} >
@@ -99,6 +100,7 @@ const MemberData = () => {
           <CustomInput disp="Designation" name="desgn" defval={editPost?.desgn} />
 
           <CustomInput disp="DOB" type="date" name="DOB" defval={moment(editPost?.DOB).format('YYYY-MM-DD')} />
+          <CustomInput disp="DOA" type="date" name="DOA" defval={moment(editPost?.DOA).format('YYYY-MM-DD')} />
           <button type="submit" className='bg-green-400'>
             {editPost?.id ? 'Update' : 'Create'}
           </button>
@@ -111,9 +113,12 @@ const MemberData = () => {
 
 
 
-      <DisplayData memdata={memdata} 
+      <DisplayData data={memdata} 
         handleDelete={handleDelete} 
-        handleEdit={handleEdit} />
+        handleEdit={handleEdit} 
+        dispcols={['Name', 'Designation', 'DOB', 'DOA']}
+        cols = {['name', 'desgn', 'DOB', 'DOA']}
+        />
 
 
       ;
@@ -130,21 +135,20 @@ export function CustomInput({ disp, name, type = "text", defval = null }) {
   );
 }
 
-const DisplayData = ({ memdata, handleDelete, handleEdit }) => {
+const DisplayData = ({  data, handleDelete, handleEdit, cols ,dispcols }) => {
   const [pageCount, setPageCount] = useState();
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
-  const [data, setData] = useState([]);
+  const [dispData, setData] = useState([]);
+
+
 
   useEffect(() => {
-    if (memdata) {
-      setData(memdata);
+    if (data) {
+      setData(data);
     }
-
-    console.log('dis');
-
-    let filterData = memdata.filter(post => {
+    let filterData = data.filter(post => {
       return post.name && post.name.toLowerCase().includes(searchText.toLowerCase())
     });
 
@@ -153,21 +157,15 @@ const DisplayData = ({ memdata, handleDelete, handleEdit }) => {
       setPageCount(Math.ceil(filterData.length / itemsPerPage));
     }
     else {
-      setPageCount(Math.ceil(memdata.length / itemsPerPage));
+      setPageCount(Math.ceil(data.length / itemsPerPage));
     }
-
-
-
 
     filterData = filterData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
     setData(filterData);
 
-
-
-
-  }, []);
-  // data, searchText, page, itemsPerPage
+  }, [data, searchText, page, itemsPerPage]);
+   
 
   return (
     <>
@@ -177,22 +175,22 @@ const DisplayData = ({ memdata, handleDelete, handleEdit }) => {
         <input type="text" value={searchText}
           placeholder="Enter name to search"
           onChange={(e) => setSearchText(e.target.value)} />
-        {data.length}---{pageCount}
+        {dispData.length}---{pageCount}
       </div>
       <DispdataStyle>
-        <div className='head'>Name</div>
-        <div className='head'>Designation</div>
-        <div className='head'>DOB</div>
-        <div className='head'>Action</div>
+        {dispcols.map((x, index) => (<div key={index} className='head'>{x}</div>))}
       </DispdataStyle>
 
 
-      {data.map(x => (
+      {dispData.map(x => (
         <DispdataStyle key={x.id} >
-          <div>{x.name}</div>
-          <div>{x.desgn}</div>
-          <div>{moment(x.DOB).format('DD-MM-YYYY')}</div>
+
+           {cols.map((f, index) => (
+                <div key={index}>{ dtFields.includes(f) ? moment(x[f]).format('DD-MM-YYYY') : x[f]}</div>
+                
+                ))}
           <div>
+           
             <button onClick={() => handleEdit(x)}>Edit</button>
             <button onClick={() => handleDelete(x.id)}>Delete</button>
           </div>
@@ -220,6 +218,8 @@ const DisplayData = ({ memdata, handleDelete, handleEdit }) => {
           </IconContext.Provider>
         }
       />
+
+        {/* <pre>{JSON.stringify(data[1], null, 2)}</pre> */}
 
     </>
   )

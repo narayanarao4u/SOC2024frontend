@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts, createPost, updatePost, deletePost } from '../redux/accountSlice';
+import { fetchACs, createAC, updateAC, deleteAC } from '../redux/accountSlice';
 import moment from 'moment'
 import DisplayData from './common/DisplayData';
 
@@ -10,8 +10,10 @@ const ACData = () => {
   const status = useSelector(state => state.acdata.status);
   const error = useSelector(state => state.acdata.error);
 
-  const url = `http://localhost:3005/api/AC_tb`;
-  // const [editPost, setEditPost] = useState(null);
+
+  const baseURL = import.meta.env.VITE_APP_BASE_URL;
+  const url = `${baseURL}/api/account`;
+
   const editPost = useSelector(state => state.acdata.selected);
   const [searchText, setSearchText] = useState('');
 
@@ -21,7 +23,7 @@ const ACData = () => {
 
   useEffect(() => {
     if (url && status === 'idle') {
-      dispatch(fetchPosts(url));
+      dispatch(fetchACs(url));
     }
     console.log('firedddd');
   }, [url, status, dispatch]);
@@ -44,10 +46,10 @@ const ACData = () => {
 
 
     if (frmdata.id) {
-      dispatch(updatePost({ url, id: frmdata.id, data: frmdata }));
+      dispatch(updateAC({ url, id: frmdata.id, data: frmdata }));
       // setEditPost(null);
     } else {
-      dispatch(createPost({ url, data: frmdata }));
+      dispatch(createAC({ url, data: frmdata }));
       // setEditPost(null);
     }
 
@@ -58,7 +60,7 @@ const ACData = () => {
 
   const handleEdit = (post) => {
     frm.current.reset();
-    dispatch({ type: 'acdata/selectPost', payload: post });
+    dispatch({ type: 'acdata/selectAC', payload: post });
   };
 
   const handleDelete = (id) => {
@@ -94,10 +96,10 @@ const ACData = () => {
           <input type="hidden" name="id" defaultValue={editPost?.id} />
 
           <label htmlFor="Name">Name</label>
-          <input type="text" name="name" id="name" defaultValue={editPost?.name}  required/>
+          <input type="text" name="name" id="name" defaultValue={editPost?.name} required />
 
           <label htmlFor="degn">Designation</label>
-          <input type="text" name="desgn" id="desgn" defaultValue={editPost?.desgn} required/>
+          <input type="text" name="desgn" id="desgn" defaultValue={editPost?.desgn} required />
 
           {/* <input type="date" name='DOB' placeholder="Enter DOB" 
             defaultValue={moment(editPost?.DOB).format('YYYY-MM-DD')} /> */}
@@ -111,15 +113,17 @@ const ACData = () => {
 
 
 
-        <h2>Account Details</h2>
-        <DisplayData data={data} 
-        handleEdit={handleEdit} 
+      <h2>Account Details</h2>
+      <DisplayData data={data}
+        handleEdit={handleEdit}
         handleDelete={handleDelete}
-        dispcols={['id', 'AC Type']}
-        cols =   {['id', 'AC_type']}
-         />
+        dispcols={['id', 'AC', 'No', 'DOC', 'MemID', 'Amount']}
+        cols={['id', 'AC_Sub', 'ACNO', 'DOC', 'MEMID', 'Amt']}
+      />
 
-      
+      <pre>{JSON.stringify(data[1], null, 2)}</pre>
+
+
     </div>
   );
 };

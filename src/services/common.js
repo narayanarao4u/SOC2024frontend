@@ -1,1 +1,1 @@
-export const dtFields = ['DOB', 'DOE', 'DOA', 'DOR', 'DOM'];
+export const dtFields = ['DOB', 'DOC', 'DOA', 'DOR', 'DOM'];

@@ -6,7 +6,7 @@ const Home = () => {
   const acdata = useSelector(state => state.acdata.data);
   const SelectedAC = useSelector(state => state.acdata.selected);
 
-  const memdata = useSelector(state => state.memdata.data);
+  const memdata = useSelector(state => state.memdata.members);
   
   return (
     <Card>

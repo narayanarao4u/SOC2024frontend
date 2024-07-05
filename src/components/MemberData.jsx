@@ -17,7 +17,8 @@ const MemberData = () => {
   const error = useSelector(state => state.memdata.error);
   const [data, setData] = useState([]);
 
-  const url = `http://localhost:3005/api/member`;
+  const baseURL = import.meta.env.VITE_APP_BASE_URL;
+  const url = `${baseURL}/api/member`;
   // const [editPost, setEditPost] = useState(null);
   const editPost = useSelector(state => state.memdata.selected);
  

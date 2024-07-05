@@ -5,6 +5,7 @@ import { AiFillLeftCircle, AiFillRightCircle } from "react-icons/ai"; // icons f
 import { IconContext } from "react-icons"; // for customizing icons
 import { dtFields } from "../../services/common";
 import moment from 'moment'
+import { useSelector } from "react-redux";
 
 
 
@@ -14,6 +15,10 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [searchText, setSearchText] = useState('');
   const [dispData, setData] = useState([]);
+
+  const members = useSelector(state => state.memdata.members);
+
+
 
 
 
@@ -28,14 +33,16 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
     let filterData = data;
 
 
-    if (filterData) {
+    if (filterData.length > 0) {
       setPageCount(Math.ceil(filterData.length / itemsPerPage));
+      filterData = filterData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
     }
     else {
       setPageCount(Math.ceil(data.length / itemsPerPage));
     }
 
-    filterData = filterData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+
 
     setData(filterData);
 
@@ -67,16 +74,23 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
       {dispData.map(x => (
         <DispdataStyle key={x.id} >
 
-          {cols.map((f, index) => (
-            <div key={index}>
-              {dtFields.includes(f) ? moment(x[f]).format('DD-MM-YYYY') : x[f]}
-            </div>
+          {cols.map((f, index) => {
+            if (f === 'MEMID') {
 
-          ))}
+              let mem = members.find(m => m.id === x[f])
+
+              return <div>{mem?.name}</div>
+            }
+
+            return (<div key={index}>
+              {dtFields.includes(f) ? moment(x[f]).format('DD-MM-YYYY') : x[f]}
+            </div>)
+
+          })}
           <div>
 
-            <button onClick={() => handleEdit(x)}>Edit</button>
-            <button onClick={() => handleDelete(x.id)}>Delete</button>
+            <button onClick={() => handleEdit(x)} className="bg-blue-500 mx-2 text-white">Edit</button>
+            <button onClick={() => handleDelete(x.id)} className="bg-red-500 text-white">Delete</button>
           </div>
 
         </DispdataStyle>
@@ -113,9 +127,16 @@ const DispdataStyle = styled.div`
   display: flex;
   gap: 2px;
   position: relative;
+  margin-bottom: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;  
+  }
 
   div {
     flex: 1;    
+    
   }
 
   .head {

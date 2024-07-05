@@ -26,6 +26,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
     if (data) {
       setData(data);
     }
+
     // let filterData = data.filter(post => {
     //   return post.name && post.name.toLowerCase().includes(searchText.toLowerCase())
     // });

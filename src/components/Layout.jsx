@@ -1,23 +1,35 @@
-import React, { lazy, Suspense }  from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import MemberData from './MemberData';
-import  ACData from './ACData';
+import ACData from './ACData';
+import Trans from './Trans';
+import { useDispatch } from 'react-redux';
+import { fetchTransDescs } from '../redux/transDescSlice';
 
 // const MemberData = lazy(() => import('./MemberData'));
 // const ACData = lazy(() => import('./ACData'));
 
 function Layout() {
+  const dispatch = useDispatch()
+  const baseURL = import.meta.env.VITE_APP_BASE_URL;
+
+  useEffect(() => {
+    dispatch(fetchTransDescs(`${baseURL}/api/transdesc`));
+  }, [dispatch])
+
   return (
     <>
       <Routes>
         <Route element={<RouterLayout />} >
           <Route index path="/" element={<Home />} />
-          <Route path="/members" element={  <MemberData />} />
-          <Route path="/accounts" element={  <ACData />} />
-            
+          <Route path="/members" element={<MemberData />} />
+          <Route path="/accounts" element={<ACData />} />
+          <Route path="/trans" element={<Trans />} />
+          <Route path="/trans/:transby/:id" element={<Trans />} />
+
           {/* <Route path="/accounts" element={
               <Suspense fallback={<div>Loading...</div>}>
                 <ACData />

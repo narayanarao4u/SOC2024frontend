@@ -4,11 +4,10 @@ import axios from "axios";
 export const fetchTransDescs = createAsyncThunk(
   "transdesc/fetchTransDescs",
   async (url, { getState, rejectWithValue }) => {
-    console.log(url);
+    // console.log(url);
     // console.log("getState", getState());
     try {
       const response = await axios.get(url);
-      console.log("response", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response);

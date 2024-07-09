@@ -7,7 +7,7 @@ import moment from 'moment'
 
 import Portal1 from '../utilities/Portal1';
 
-import { dtFields   } from '../services/common.js';
+import { dtFields } from '../services/common.js';
 import DisplayData from './common/DisplayData.jsx';
 
 const MemberData = () => {
@@ -21,9 +21,9 @@ const MemberData = () => {
   const url = `${baseURL}/api/member`;
   // const [editPost, setEditPost] = useState(null);
   const editPost = useSelector(state => state.memdata.selected);
- 
 
- 
+
+
 
   const [isOpen, setIsopen] = useState(false)
   const onClose = () => setIsopen(false)
@@ -37,7 +37,7 @@ const MemberData = () => {
     if (url && status === 'idle') {
       dispatch(fetchPosts(url));
     }
-  
+
     setData(memdata);
   }, [url, status, dispatch]);
 
@@ -52,11 +52,11 @@ const MemberData = () => {
     let frm = new FormData(e.target);
     let frmdata = Object.fromEntries(frm);
 
-    Object.keys(frmdata).forEach((key ) => {
-     
-      if( dtFields.includes(key) ) frmdata[key] =new Date((frmdata[key]));
+    Object.keys(frmdata).forEach((key) => {
+
+      if (dtFields.includes(key)) frmdata[key] = new Date((frmdata[key]));
     })
-    
+
 
     if (frmdata.id) {
       dispatch(updatePost({ url, id: frmdata.id, data: frmdata }));
@@ -82,13 +82,17 @@ const MemberData = () => {
     dispatch(deletePost({ url, id }));
   };
 
+  function filterFun(post, searchText = "") {
+    return post.name.toLowerCase().includes(searchText.toLowerCase())
+  }
+
   if (status === 'loading') return <div>Loading...</div>;
   if (status === 'failed') return <div>Error: {error}</div>;
 
   return (
     <div className='px-4'>
       <h2>Member Data</h2>
- 
+
 
 
       <Portal1 isOpen={isOpen} onClose={onClose} >
@@ -103,7 +107,11 @@ const MemberData = () => {
           <button type="submit" className='bg-green-400'>
             {editPost?.id ? 'Update' : 'Create'}
           </button>
-          <button onClick={() => setEditPost(null)}
+          <button onClick={() => {
+            setIsopen(false);
+            frm.current.reset();
+            dispatch({ type: 'memdata/selectPost', payload: null });
+          }}
             type='reset'
             className='bg-red-400' > Cancel</button>
         </form>
@@ -112,12 +120,13 @@ const MemberData = () => {
 
 
 
-      <DisplayData data={memdata} 
-        handleDelete={handleDelete} 
-        handleEdit={handleEdit} 
+      <DisplayData data={memdata}
+        handleDelete={handleDelete}
+        handleEdit={handleEdit}
+        filterFun={filterFun}
         dispcols={['GNO', 'Name', 'Designation', 'DOB', 'DOA']}
-        cols =   {['gno', 'name', 'desgn', 'DOB', 'DOA']}
-        />
+        cols={['gno', 'name', 'desgn', 'DOB', 'DOA']}
+      />
 
 
       ;

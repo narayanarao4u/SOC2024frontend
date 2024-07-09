@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components'
-import { fetchTransDescs } from '../redux/transdeescSlice';
+import { fetchTransDescs } from '../redux/transDescSlice';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -20,21 +20,25 @@ const Home = () => {
 
   return (
     <Card>
-      <section>
-        <pre>
-          {JSON.stringify(members, null, 2)}
-        </pre>
 
-      </section>
+      {
+        members && (
+          <section>
+            <h3>Members</h3>
+            <div>Total Members : {members.members && members?.members.length}</div>
+            <div>Selected Member : {members.selected?.name}</div>
+          </section>
+        )
+      }
 
-      <section>
-        {/* <div>Accounts : {acdata.data.length}</div>
-        <div> SelectedAccounts : {acdata.SelectedAC?.id} </div> */}
+      {members && (
+        <section>
+          <h3>Accounts</h3>
+          <div>Total Accounts : {acdata.data && acdata?.data.length}</div>
+          <div>Selected Member : {acdata.selected?.name}</div>
+        </section>
+      )}
 
-        <pre>
-          {JSON.stringify(members, null, 2)}
-        </pre>
-      </section>
 
       <section>
         {/* <div>Accounts : {transDesc.transdesc ? transDesc.transdesc.length : 0}</div> */}

@@ -25,7 +25,7 @@ const ACData = () => {
     if (url && status === 'idle') {
       dispatch(fetchACs(url));
     }
-    console.log('firedddd');
+
   }, [url, status, dispatch]);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const ACData = () => {
       // setEditPost(null);
     }
 
-    dispatch({ type: 'acdata/selectPost', payload: null });
+    dispatch({ type: 'acdata/selectAC', payload: null });
     e.target.reset();
 
   };
@@ -75,6 +75,10 @@ const ACData = () => {
 
     dispatch({ type: 'posts/filterPosts', payload: filterData });
 
+  }
+
+  function filterFun(post, searchText = "") {
+    return post.ACNO.toLowerCase().includes(searchText.toLowerCase())
   }
 
   if (status === 'loading') return <div>Loading...</div>;
@@ -117,11 +121,12 @@ const ACData = () => {
       <DisplayData data={data}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
+        filterFun={filterFun}
         dispcols={['id', 'AC', 'No', 'DOC', 'MemID', 'Amount']}
         cols={['id', 'AC_Sub', 'ACNO', 'DOC', 'MEMID', 'Amt']}
       />
 
-      <pre>{JSON.stringify(data[1], null, 2)}</pre>
+      {/* <pre>{JSON.stringify(data[1], null, 2)}</pre> */}
 
 
     </div>

@@ -6,10 +6,11 @@ import { IconContext } from "react-icons"; // for customizing icons
 import { dtFields } from "../../services/common";
 import moment from 'moment'
 import { useSelector } from "react-redux";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 
 
-const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
+const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun, dispActionBtn = true }) => {
   const [pageCount, setPageCount] = useState();
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -18,20 +19,18 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
 
   const members = useSelector(state => state.memdata.members);
 
-
-
-
-
   useEffect(() => {
     if (data) {
       setData(data);
     }
 
     // let filterData = data.filter(post => {
+
     //   return post.name && post.name.toLowerCase().includes(searchText.toLowerCase())
     // });
 
-    let filterData = data;
+    let filterData = data.filter((p) => filterFun(p, searchText))
+    // let filterData = data;
 
 
     if (filterData.length > 0) {
@@ -68,7 +67,8 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
       </div>
       <DispdataStyle>
         {dispcols.map((x, index) => (<div key={index} className='head'>{x}</div>))}
-        <div className='head'>Action</div>
+        {dispActionBtn && <div className='head'>Action</div>}
+
       </DispdataStyle>
 
 
@@ -80,7 +80,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
 
               let mem = members.find(m => m.id === x[f])
 
-              return <div>{mem?.name}</div>
+              return <div key={index}>{mem?.name}</div>
             }
 
             return (<div key={index}>
@@ -88,11 +88,19 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols }) => {
             </div>)
 
           })}
-          <div>
 
-            <button onClick={() => handleEdit(x)} className="bg-blue-500 mx-2 text-white">Edit</button>
-            <button onClick={() => handleDelete(x.id)} className="bg-red-500 text-white">Delete</button>
-          </div>
+
+          {dispActionBtn &&
+            <div>
+
+              <button onClick={() => handleEdit(x)} className="bg-blue-500 mx-2 text-white">
+                <FaEdit />
+              </button>
+              <button onClick={() => handleDelete(x.id)} className="bg-red-500 text-white">
+                <FaTrashAlt />
+              </button>
+            </div>
+          }
 
         </DispdataStyle>
       ))}

@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async (url) => {
-  console.log('memdata' , url);
   const response = await axios.get(url);
   return response.data;
 });
@@ -22,23 +21,22 @@ export const deletePost = createAsyncThunk("posts/deletePost", async ({ url, id 
   return id;
 });
 
-const initialState =  {
+const initialState = {
   members: [],
   status: "idle",
   error: null,
   selected: null,
-
-}
+};
 const memdataSlice = createSlice({
   name: "memdata",
   initialState,
   reducers: {
-    selectPost: (state, action) => {      
-      state.selected = action.payload;      
+    selectPost: (state, action) => {
+      state.selected = action.payload;
     },
-    filterPosts: (state, action) => {      
+    filterPosts: (state, action) => {
       state.members = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,7 +65,5 @@ const memdataSlice = createSlice({
       });
   },
 });
-
-
 
 export default memdataSlice.reducer;

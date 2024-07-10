@@ -8,28 +8,23 @@ import moment from 'moment'
 import Portal1 from '../utilities/Portal1';
 
 import { dtFields } from '../services/common.js';
-import DisplayData from './common/DisplayData.jsx';
+
+import MemberSearch from './MemberSearch.jsx';
 
 const MemberData = () => {
   const dispatch = useDispatch();
-  const memdata = useSelector(state => state.memdata.members);
+
   const status = useSelector(state => state.memdata.status);
   const error = useSelector(state => state.memdata.error);
-  const [data, setData] = useState([]);
+
 
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
   const url = `${baseURL}/api/member`;
   // const [editPost, setEditPost] = useState(null);
   const editPost = useSelector(state => state.memdata.selected);
 
-
-
-
   const [isOpen, setIsopen] = useState(false)
   const onClose = () => setIsopen(false)
-
-
-
 
   const frm = useRef(null);
 
@@ -38,12 +33,9 @@ const MemberData = () => {
       dispatch(fetchPosts(url));
     }
 
-    setData(memdata);
+
   }, [url, status, dispatch]);
 
-
-
-  //how to filter the data 
 
 
 
@@ -91,9 +83,6 @@ const MemberData = () => {
 
   return (
     <div className='px-4'>
-      <h2>Member Data</h2>
-
-
 
       <Portal1 isOpen={isOpen} onClose={onClose} >
         <form onSubmit={handleSubmit} ref={frm} className='grid grid-cols-2 gap-1'>
@@ -120,14 +109,8 @@ const MemberData = () => {
 
 
 
-      <DisplayData data={memdata}
-        handleDelete={handleDelete}
-        handleEdit={handleEdit}
-        filterFun={filterFun}
-        dispcols={['GNO', 'Name', 'Designation', 'DOB', 'DOA']}
-        cols={['gno', 'name', 'desgn', 'DOB', 'DOA']}
-      />
 
+      <MemberSearch handleEdit={handleEdit} handleDelete={handleDelete} />
 
       ;
     </div>

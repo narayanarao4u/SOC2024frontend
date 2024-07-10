@@ -79,9 +79,20 @@ const CustomSelect = ({ data, onFilter, tableColumns, selectedRow, setselectedRo
     } else if (e.key === 'Enter') { //&& selectedIndex !== -1
       lostfocus();
       setIsVisible(false); // Hide table when Enter is pressed
-      const currentTabIndex = e.target.tabIndex;
-      const nextInput = e.target.form.elements[currentTabIndex];
-      nextInput.focus();
+
+      try {
+        const currentTabIndex = e.target.tabIndex;
+        if (currentTabIndex) {
+          const nextInput = e.target.form.elements[currentTabIndex];
+          nextInput.focus();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+
+
+
 
     } else {
 

@@ -11,7 +11,7 @@ const Sidebar = () => {
         <Link to="/" className={linkStyles}>Home</Link>
         <Link to="/members" className={linkStyles}>Members</Link>
         <Link to="/accounts" className={linkStyles}>Accounts</Link>
-        <Link to="/trans/ACID/1" className={linkStyles}>Transactions</Link>
+        <Link to="/trans/ActionID/490" className={linkStyles}>Transactions</Link>
 
 
       </nav>

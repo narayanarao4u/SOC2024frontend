@@ -10,7 +10,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 
 
-const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun, dispActionBtn = true }) => {
+const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun, showActionBtn = true }) => {
   const [pageCount, setPageCount] = useState();
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -67,7 +67,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun
       </div>
       <DispdataStyle>
         {dispcols.map((x, index) => (<div key={index} className='head'>{x}</div>))}
-        {dispActionBtn && <div className='head'>Action</div>}
+        {showActionBtn && <div className='head'>Action</div>}
 
       </DispdataStyle>
 
@@ -90,7 +90,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun
           })}
 
 
-          {dispActionBtn &&
+          {showActionBtn &&
             <div>
 
               <button onClick={() => handleEdit(x)} className="bg-blue-500 mx-2 text-white">
@@ -111,6 +111,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun
         containerClassName={"pagination"}
         pageClassName={"page-item"}
         activeClassName={"active"}
+        pageRangeDisplayed={3}
         onPageChange={(event) => setPage(event.selected)}
         pageCount={pageCount}
         breakLabel="..."

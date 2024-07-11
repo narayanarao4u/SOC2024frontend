@@ -29,9 +29,13 @@ const initialState = {
   selected: null,
 };
 const transSlice = createSlice({
-  name: "memdata",
+  name: "trans",
   initialState,
   reducers: {
+    addTrans: (state, action) => {
+      console.log("addTrans", action.payload);
+      state.data.unshift(action.payload);
+    },
     selectPost: (state, action) => {
       state.selected = action.payload;
     },

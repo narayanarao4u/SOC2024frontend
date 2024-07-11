@@ -32,12 +32,7 @@ const MemberData = () => {
     if (url && status === 'idle') {
       dispatch(fetchPosts(url));
     }
-
-
   }, [url, status, dispatch]);
-
-
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +40,6 @@ const MemberData = () => {
     let frmdata = Object.fromEntries(frm);
 
     Object.keys(frmdata).forEach((key) => {
-
       if (dtFields.includes(key)) frmdata[key] = new Date((frmdata[key]));
     })
 

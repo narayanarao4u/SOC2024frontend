@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { fetchTrans, createTrans, updateTrans, deleteTrans } from '../redux/transSlice'
+
+import { ToastContainer, toast } from 'react-toastify';
+
 import styled from 'styled-components'
 import moment from 'moment'
 import { fetchACs } from '../redux/accountSlice'
@@ -10,6 +13,7 @@ import { FaEdit, FaSave, FaSearch } from 'react-icons/fa'
 
 import EMPComponent from './bin/EMPComponent'
 import AC_Combo from './bin/AC_Combo'
+import { dtFields } from '../services/common';
 
 const TranContext = createContext()
 
@@ -52,6 +56,8 @@ function Trans() {
   const transDesc = useSelector(state => state.transDesc.transdesc)
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
+  const [actionid, setActionid] = useState(params.id)
+
   const [cr, setCr] = useState(newTrans)
   const [pr, setPr] = useState({})
 
@@ -62,12 +68,24 @@ function Trans() {
 
   useEffect(() => {
     dispatch(fetchTrans(`${baseURL}/api/trans/${params.transby}/${params.id}`))
+    console.log('useEffect dispatch');
   }, [dispatch])
 
 
   useEffect(() => {
-    getByACID(ACID)
-  }, [ACID])
+
+    try {
+
+    } catch (error) {
+
+    }
+
+  }, [trans])
+
+
+  useEffect(() => {
+    getByACID(cr.ACID)
+  }, [cr.ACID])
 
 
   useEffect(() => {
@@ -76,25 +94,126 @@ function Trans() {
 
 
   const getByACID = async (id) => {
+    if (!id) return 0
     const acRes = await FetchClient.get(`${baseURL}/api/account/${id}`)
     const acTransRes = await FetchClient.get(`${baseURL}/api/trans/ACID/${id}`)
-    setCr({ ...cr, ACID: acRes[0].id })
+    if (acRes) {
+      setACID(acRes[0].id)
+      setAC(acRes[0])
+    }
+
     setACTrans(acTransRes)
-    setAC(acRes[0])
+
+    setPr(ACTrans[0])
+
   }
 
   const handleSave = (e) => {
-    e.stopPropagation();
-    e.nativeEvent.stopImmediatePropagation();
+    // e.stopPropagation();
+    // e.nativeEvent.stopImmediatePropagation();
     e.preventDefault()
-    let cr2 = { ...cr }
-    cr2.ActionID = 490
+    if (cr.Trans_des_ID < 0) {
+      toast.error('Select Transcation ');
+      return;
+    }
 
-    // const res = await FetchClient.post(`${baseURL}/api/trans`, cr2)
-    //dispatch(createPost({ url, data: frmdata }));
-    dispatch(createTrans({ url: `${baseURL}/api/trans`, data: cr2 }))
+
+    let c = { ...cr }
+
+
+    /*   let p = trans.find(item => item.ACID === c.ACID)
+      if (p === undefined) p = { ...p }
+      else p = { ...pr } */
+
+    let p = trans.data.find(item => item.ACID === c.ACID) || { ...pr }
+    setPr(p);
+
+
+
+    let t = transDesc.find(item => item.id === c.Trans_des_ID)
+
+    //#region  Row Calculation
+
+    c.ActionID = actionid
+
+
+    c.Days = moment(c.Trans_dt).diff(moment(p.Trans_dt), 'days')
+    // c.INT_D = Math.min(c.Total_amt, c.INT_C);
+    if (t.Post_type[2] === "C") {
+      const principal = p.PRN_B;
+      const rate = p.rate / 100;
+      const timeInYears = c.Days / 365;
+      const compoundingFrequency = 4; // Assuming interest is compounded Quterly
+
+      c.INT_C = principal * Math.pow((1 + rate / compoundingFrequency), compoundingFrequency * timeInYears);
+      c.INT_C = Math.round(c.INT_C * 100) / 100;
+
+    } else {
+      c.INT_C = Math.round(((p.PRN_B * p.rate * c.Days) / 36500), 2)
+    }
+
+
+    c.INT_D = c.Total_amt > (c.INT_C + p.INT_B) ? (c.INT_C + p.INT_B) : c.Total_amt;
+
+
+    switch (t.Post_type.slice(0, 2)) {
+      case "PC":
+        c.PRN_C = (c.Total_amt - c.INT_D) > 0 ? c.Total_amt - c.INT_D : 0
+        c.PRN = c.PRN_C
+        c.PRN_D = 0
+        // c.PRN_B = p.PRN_B + c.PRN_C - c.PRN_D;
+        break;
+      case "PD":
+        c.PRN_D = (c.Total_amt - c.INT_D) > 0 ? c.Total_amt - c.INT_D : 0
+        c.PRN = c.PRN_D
+        c.PRN_C = 0
+        // c.PRN_B = p.PRN_B + c.PRN_C - c.PRN_D;
+        break;
+      case "ID":
+        c.PRN_D = 0
+        c.PRN_C = 0
+        // c.PRN_B = p.PRN_B + c.PRN_C - c.PRN_D;
+        c.INT_D = c.Total_amt
+        c.INT = c.INT_D
+
+        break;
+      case "IC":
+        c.PRN_D = 0
+        c.PRN_C = 0
+        // c.PRN_B = p.PRN_B + c.PRN_C - c.PRN_D;
+        c.INT_C = c.Total_amt
+        c.INT = c.INT_C
+
+        break;
+
+      default:
+        break;
+    }
+    c.INT = c.INT_D
+    c.PRN_B = p.PRN_B + c.PRN_C - c.PRN_D;
+    c.INT_B = p.INT_B + c.INT_C - c.INT_D;
+
+    //#endregion
+
+
+
+
+    setCr(c)
+    // cr2.Trans_dt = moment(cr2.Trans_dt).format("YYYY-MM-DD HH:mm:ss")
+    // cr2.CB_dt = moment(cr2.CB_dt).format("YYYY-MM-DD HH:mm:ss")
+
+    Object.keys(c).forEach((key) => {
+      if (dtFields.includes(key)) {
+        // cr2[key] = new Date((cr2[key]));
+        c[key] = moment(c[key]).format("YYYY-MM-DD HH:mm:ss");
+
+      }
+
+    })
+    dispatch({ type: 'trans/addTrans', payload: c })
     setCr(newTrans);
     setACID(0)
+    console.log('handleSave cliked end');
 
   }
 
@@ -105,45 +224,63 @@ function Trans() {
       <h3>Add Transcation</h3>
       <div>
 
+        <div>
+          AC Sub : {AC?.AC_Sub}
+          ACNO : {AC?.ACNO}
+          Member : {AC?.mem_tb?.name}
+          ||| TransID : {cr?.Trans_des_ID}
+        </div>
+        <div className='grid grid-cols-2'>
+          <pre>
+            cr Row : <br />
+            {JSON.stringify(cr, null, 2)}
+          </pre>
 
-        <label>AC Sub : {AC?.AC_Sub}</label>
-        <label> : {AC?.ACNO}</label>
-        <label> : {AC?.mem_tb?.name}</label>
+          <pre>
+            pr Row : <br />
+            {JSON.stringify(pr, null, 2)}
+          </pre>
+
+        </div>
+
 
 
         <br />
         <br />
         {/* <EMPComponent MEMID={memID} tabIndex="1" setMemID={setMemID} /> */}
         <br />
-        <form action="">
+        <form action="" onSubmit={handleSave}>
           <TransStyle>
-            <label>ACID</label>
-            <label>ACNO</label>
-            <label>Transaction</label>
-            <label>Trans Date</label>
-            <label>CB Date</label>
-            <label>Instrument No</label>
-            <label>Cash Amt</label>
-            <label>cheque Amt</label>
-            <label>Adjust Amt</label>
-            <label>Total Amt</label>
-            <div>Actions</div>
+            <>
+              <label>ACID</label>
+              <label>ACNO</label>
+              <label>Transaction</label>
+              <label>Trans Date</label>
+              <label>CB Date</label>
+              <label>Instrument No</label>
+              <label>Cash Amt</label>
+              <label>cheque Amt</label>
+              <label>Adjust Amt</label>
+              <label>Total Amt</label>
+              <div>Actions</div>
 
+            </>
 
-
-            <input type="text" name="ACID" id="ACID" value={ACID}
+            <input type="number" name="ACID" id="ACID" value={cr?.ACID}
               className='text-center'
-              onChange={(e) => setACID(+e.target.value)}
+              onChange={e => setCr({ ...cr, ACID: +e.target.value })}
               onBlur={(e) => getByACID(+e.target.value)}
               tabIndex={0}
+              min={1}
             />
             <div>
               <AC_Combo ACID={ACID} tabindex={1} setACID={setACID} displayColumn={'ACNO'} />
             </div>
 
 
-            <select name="transID" value={cr?.Trans_des_ID} onChange={(e) => setCr({ ...cr, Trans_des_ID: +e.target.value })} tabIndex={2}>
-              <option value={-1}></option>
+            <select name="transID" value={cr?.Trans_des_ID}
+              onChange={(e) => setCr({ ...cr, Trans_des_ID: +e.target.value })} tabIndex={2} required min={1}>
+              <option value={-1} disabled >Select</option>
               {AC && transDesc.filter(a => a.AC_Sub === AC.AC_Sub).map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.Trans_desc}
@@ -151,30 +288,28 @@ function Trans() {
               ))}
 
             </select>
-            <input type="date" name="Trans_dt" id="Trans_dt" value={moment(cr?.Trans_dt).format('YYYY-MM-DD')}
+            <input type="date" name="Trans_dt" id="Trans_dt" value={moment(cr?.Trans_dt).format('YYYY-MM-DD')} required
               onChange={(e) => setCr({ ...cr, Trans_dt: e.target.value })} tabIndex={3} />
 
-            <input type="date" name="CB_dt" id="CB_dt" value={moment(cr?.CB_dt).format('YYYY-MM-DD')}
+            <input type="date" name="CB_dt" id="CB_dt" value={moment(cr?.CB_dt).format('YYYY-MM-DD')} required
               onChange={(e) => setCr({ ...cr, CB_dt: e.target.value })} tabIndex={4} />
 
-            <input type="text" name="I_NO" id="I_NO" value={cr?.I_NO}
+            <input type="text" name="I_NO" id="I_NO" value={cr?.I_NO} required
               onChange={(e) => setCr({ ...cr, I_NO: e.target.value })} tabIndex={5} />
 
-            <input type="number" name="Cash_amt" id="Cash_amt" value={cr?.Cash_amt}
+            <input type="number" name="Cash_amt" id="Cash_amt" value={cr?.Cash_amt} required
               onChange={(e) => setCr({ ...cr, Cash_amt: +e.target.value })} tabIndex={6} />
 
-            <input type="number" name="Chq_amt" id="Chq_amt" value={cr?.Chq_amt}
+            <input type="number" name="Chq_amt" id="Chq_amt" value={cr?.Chq_amt} required
               onChange={(e) => setCr({ ...cr, Chq_amt: +e.target.value })} tabIndex={7} />
 
-            <input type="number" name="Adj_amt" id="Adj_amt" value={cr?.Adj_amt}
+            <input type="number" name="Adj_amt" id="Adj_amt" value={cr?.Adj_amt} required
               onChange={(e) => setCr({ ...cr, Adj_amt: +e.target.value })} tabIndex={8} />
 
-            <input type="number" name="Total_amt" id="Total_amt" value={cr?.Total_amt}
+            <input type="number" name="Total_amt" id="Total_amt" value={cr?.Total_amt} required
               onChange={(e) => setCr({ ...cr, Total_amt: +e.target.value })} tabIndex={9} readOnly />
             <div>
-              <button className='bg-green-600 text-gray-300-200'
-                onClick={handleSave}
-              >
+              <button type='submit' className='bg-green-600 text-gray-300-200'>
                 <FaSave size={20} /> </button>
 
             </div>
@@ -193,7 +328,7 @@ function Trans() {
       {ACTrans && <DispTranscations data={ACTrans} />}
 
 
-
+      <ToastContainer />
       <pre className="border border-red-600 overflow-auto">
         {JSON.stringify(params, null, 2)}
         <section className="flex">
@@ -213,7 +348,7 @@ function Trans() {
 
 const TransStyle = styled.section`
   display: grid;
-  grid-template-columns: 50px  100px 150px repeat(8, 100px) ;
+  grid-template-columns: 75px  100px 150px repeat(8, 100px) ;
 `;
 function DispTranscations({ data, showBtn = false }) {
 
@@ -269,10 +404,6 @@ tr.selected {
 
   return (
     <div>
-
-
-
-
       <DispTrans >
         <h3>Transaction</h3>
         <table>
@@ -294,10 +425,10 @@ tr.selected {
             </tr>
           </thead>
           <tbody >
-            {data.map(item => (
-              <tr key={item.id} className={cr && item.id === cr.id ? 'selected' : ''}>
+            {data && data.map((item, i) => (
+              <tr key={i} className={cr && item.id === cr.id ? 'selected' : ''}>
                 {/* <td>{item.id}</td> */}
-                <td>{item.ActionID}</td>
+                <td>{i}-{item.ActionID}</td>
                 <td>{item.ACID}</td>
                 <td>{transID(item.Trans_des_ID)}</td>
                 <td>{moment(item.Trans_dt).format('DD-MM-YYYY')}</td>

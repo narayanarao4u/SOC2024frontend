@@ -38,7 +38,6 @@ const AC_Combo = ({ ACID, tabindex, setACID, displayColumn }) => {
   }, [])
 
   function filterData(inputdata) {
-
     let filter = inputdata.filter(item => item.id == ACID);
     setFilteredData(filter);
     setselectedRow(filter[0]);
@@ -46,13 +45,8 @@ const AC_Combo = ({ ACID, tabindex, setACID, displayColumn }) => {
 
   useEffect(() => {
     if (ACID && initialData.length > 0) {
-
       filterData(initialData)
-
-
-
     }
-
   }, [ACID])
 
 

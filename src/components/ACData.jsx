@@ -78,7 +78,8 @@ const ACData = () => {
   }
 
   function filterFun(post, searchText = "") {
-    return post.ACNO.toLowerCase().includes(searchText.toLowerCase())
+    return post.ACNO.toLowerCase().includes(searchText.toLowerCase()) ||
+      post.AC_Sub.toLowerCase().includes(searchText.toLowerCase())
   }
 
   if (status === 'loading') return <div>Loading...</div>;

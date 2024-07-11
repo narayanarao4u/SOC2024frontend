@@ -24,26 +24,19 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun
       setData(data);
     }
 
-    // let filterData = data.filter(post => {
-
-    //   return post.name && post.name.toLowerCase().includes(searchText.toLowerCase())
-    // });
-
     let filterData = data.filter((p) => filterFun(p, searchText))
-    // let filterData = data;
-
+    let pgcount = 0
 
     if (filterData.length > 0) {
-      setPageCount(Math.ceil(filterData.length / itemsPerPage));
+      pgcount = Math.ceil(filterData.length / itemsPerPage)
       filterData = filterData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
     }
     else {
-      setPageCount(Math.ceil(data.length / itemsPerPage));
+      pgcount = Math.ceil(data.length / itemsPerPage)
+      // setPageCount(Math.ceil(data.length / itemsPerPage));
     }
 
-
-
-
+    setPageCount(pgcount);
     setData(filterData);
 
   }, [data, searchText, page, itemsPerPage]);

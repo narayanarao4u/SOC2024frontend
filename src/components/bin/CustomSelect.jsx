@@ -135,10 +135,8 @@ const CustomSelect = ({ data, onFilter, tableColumns, selectedRow, setselectedRo
   };
 
   return (
-    <>
-      {/* <pre className='inline'>
-        selectedIndex: {JSON.stringify(selectedIndex, null, 2)}
-      </pre> */}
+    <div>
+
       <input
         type="text"
         placeholder="Filter..."
@@ -177,7 +175,7 @@ const CustomSelect = ({ data, onFilter, tableColumns, selectedRow, setselectedRo
           </table>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

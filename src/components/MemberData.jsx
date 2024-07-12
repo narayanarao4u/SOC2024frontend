@@ -87,6 +87,8 @@ const MemberData = () => {
 
           <CustomInput disp="DOB" type="date" name="DOB" defval={moment(editPost?.DOB).format('YYYY-MM-DD')} />
           <CustomInput disp="DOA" type="date" name="DOA" defval={moment(editPost?.DOA).format('YYYY-MM-DD')} />
+          <CustomInput disp="Phone1" type="text" name="Phone1" defval={editPost?.Phone1} />
+
           <button type="submit" className='bg-green-400'>
             {editPost?.id ? 'Update' : 'Create'}
           </button>

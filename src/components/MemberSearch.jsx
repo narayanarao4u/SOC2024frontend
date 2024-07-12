@@ -35,7 +35,8 @@ const MemberSearch = ({ handleEdit, handleDelete }) => {
 
 
   function filterFun(post, searchText = "") {
-    return post.name.toLowerCase().includes(searchText.toLowerCase())
+    let result = post.name && post.name.toLowerCase().includes(searchText.toLowerCase())
+    return result
   }
 
   if (status === 'loading') return <div>Loading...</div>;

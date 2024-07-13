@@ -4,9 +4,6 @@ import './CustomSelect.css'; // Import CSS file for styles
 
 const CustomSelect = ({ data, onFilter, tableColumns, selectedRow, setselectedRow, displayColumn, selectColumn, tabindex, setID }) => {
 
-
-
-
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isVisible, setIsVisible] = useState(false);
 

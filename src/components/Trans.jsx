@@ -67,7 +67,9 @@ function Trans() {
   const [ACID, setACID] = useState(0)
   const [AC, setAC] = useState()
   const [ACTrans, setACTrans] = useState()
-  const [transSummary, setTransSummary] = useState({})
+  const [transSummary, setTransSummary] = useState({
+    Cash_R: 0, Cash_P: 0, Chq_R: 0, Chq_P: 0, Adj_R: 0, Adj_P: 0, receipts: 0, payments: 0
+  })
 
   useEffect(() => {
     dispatch(fetchTrans(`${baseURL}/api/trans/${params.transby}/${params.id}`))
@@ -148,9 +150,17 @@ function Trans() {
 
   const handleTransChange = (e) => {
     console.log('eeee');
-    let t = transDesc.find(item => item.id === +e.target.value)
-    setCr({ ...cr, Trans_des_ID: +e.target.value, CB_side: t.CB_side })
+    if (+e.target.name === 'Trans_des_ID') {
+      let t = transDesc.find(item => item.id === +e.target.value)
+      setCr({ ...cr, [e.target.name]: +e.target.value, CB_side: t.CB_side })
+    }
+    else {
+      setCr({ ...cr, [e.target.name]: +e.target.value })
+    }
+
   }
+
+
 
   const handleSave = (e) => {
     // e.stopPropagation();
@@ -262,7 +272,7 @@ function Trans() {
   }
 
   return (
-    <TranContext.Provider value={{ cr, setCr, setACID, trans, transDesc }}>
+    <TranContext.Provider value={{ cr, setCr, setACID, trans, transDesc, transSummary }}>
       <section className='text-xs'>
 
 
@@ -271,34 +281,18 @@ function Trans() {
 
           <div>
             AC Sub : {AC?.AC_Sub}
-            ACNO : {AC?.ACNO}
+            <AC_Combo ACID={ACID} tabindex={1} setACID={setACID} displayColumn={'ACNO'} />
+
+
+            ACNO :  {AC?.ACNO}
             Member : {AC?.mem_tb?.name}
             ||| TransID : {cr?.Trans_des_ID}
           </div>
-          {/* <div className='grid grid-cols-2'>
-            <pre>
-              cr Row : <br />
-              {JSON.stringify(cr, null, 2)}
-            </pre>
 
-            <pre>
-              pr Row : <br />
-              {JSON.stringify(pr, null, 2)}
-            </pre>
-
-          </div> */}
-
-
-
-          <br />
-          <br />
-          {/* <EMPComponent MEMID={memID} tabIndex="1" setMemID={setMemID} /> */}
-          <br />
           <form action="" onSubmit={handleSave}>
             <TransStyle>
               <>
                 <label>ACID</label>
-                <label>ACNO</label>
                 <label>Transaction</label>
                 <label>Trans Date</label>
                 <label>CB Date</label>
@@ -311,55 +305,53 @@ function Trans() {
 
               </>
 
+              <>
+                <input type="number" name="ACID" id="ACID" value={cr?.ACID}
+                  className='text-center'
+                  // onChange={e => setCr({ ...cr, ACID: +e.target.value })}
+                  onChange={handleTransChange}
+                  onBlur={(e) => getByACID(+e.target.value)}
+                  tabIndex={1}
+                  min={1}
+                />
 
-              <input type="number" name="ACID" id="ACID" value={cr?.ACID}
-                className='text-center'
-                onChange={e => setCr({ ...cr, ACID: +e.target.value })}
-                onBlur={(e) => getByACID(+e.target.value)}
-                tabIndex={0}
-                min={1}
-              />
 
+                <select name="transID" value={cr?.Trans_des_ID}
+                  onChange={handleTransChange} tabIndex={2} required min={1}>
+                  <option value={-1} disabled >Select</option>
+                  {AC && transDesc.filter(a => a.AC_Sub === AC.AC_Sub).map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.Trans_desc}
+                    </option>
+                  ))}
+
+                </select>
+
+
+                <input type="date" name="Trans_dt" id="Trans_dt" value={moment(cr?.Trans_dt).format('YYYY-MM-DD')} required
+                  onChange={(e) => setCr({ ...cr, Trans_dt: e.target.value })} tabIndex={3} />
+
+                <input type="date" name="CB_dt" id="CB_dt" value={moment(cr?.CB_dt).format('YYYY-MM-DD')} required
+                  onChange={(e) => setCr({ ...cr, CB_dt: e.target.value })} tabIndex={4} />
+
+                <input type="text" name="I_NO" id="I_NO" value={cr?.I_NO} required
+                  onChange={(e) => setCr({ ...cr, I_NO: e.target.value })} tabIndex={5} />
+
+                <input type="number" name="Cash_amt" id="Cash_amt" value={cr?.Cash_amt} required
+                  onChange={(e) => setCr({ ...cr, Cash_amt: +e.target.value })} tabIndex={6} />
+
+                <input type="number" name="Chq_amt" id="Chq_amt" value={cr?.Chq_amt} required
+                  onChange={(e) => setCr({ ...cr, Chq_amt: +e.target.value })} tabIndex={7} />
+
+                <input type="number" name="Adj_amt" id="Adj_amt" value={cr?.Adj_amt} required
+                  onChange={(e) => setCr({ ...cr, Adj_amt: +e.target.value })} tabIndex={8} />
+
+
+                <input type="number" name="Total_amt" id="Total_amt" value={cr?.Total_amt} required
+                  onChange={(e) => setCr({ ...cr, Total_amt: +e.target.value })} tabIndex={9} readOnly />
+              </>
               <div>
-                <AC_Combo ACID={ACID} tabindex={1} setACID={setACID} displayColumn={'ACNO'} />
-              </div>
-
-
-              <select name="transID" value={cr?.Trans_des_ID}
-                onChange={handleTransChange} tabIndex={2} required min={1}>
-                <option value={-1} disabled >Select</option>
-                {AC && transDesc.filter(a => a.AC_Sub === AC.AC_Sub).map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.Trans_desc}
-                  </option>
-                ))}
-
-              </select>
-
-              <input type="date" name="Trans_dt" id="Trans_dt" value={moment(cr?.Trans_dt).format('YYYY-MM-DD')} required
-                onChange={(e) => setCr({ ...cr, Trans_dt: e.target.value })} tabIndex={3} />
-
-              <input type="date" name="CB_dt" id="CB_dt" value={moment(cr?.CB_dt).format('YYYY-MM-DD')} required
-                onChange={(e) => setCr({ ...cr, CB_dt: e.target.value })} tabIndex={4} />
-
-              <input type="text" name="I_NO" id="I_NO" value={cr?.I_NO} required
-                onChange={(e) => setCr({ ...cr, I_NO: e.target.value })} tabIndex={5} />
-
-              <input type="number" name="Cash_amt" id="Cash_amt" value={cr?.Cash_amt} required
-                onChange={(e) => setCr({ ...cr, Cash_amt: +e.target.value })} tabIndex={6} />
-
-              <input type="number" name="Chq_amt" id="Chq_amt" value={cr?.Chq_amt} required
-                onChange={(e) => setCr({ ...cr, Chq_amt: +e.target.value })} tabIndex={7} />
-
-              <input type="number" name="Adj_amt" id="Adj_amt" value={cr?.Adj_amt} required
-                onChange={(e) => setCr({ ...cr, Adj_amt: +e.target.value })} tabIndex={8} />
-
-
-              <input type="number" name="Total_amt" id="Total_amt" value={cr?.Total_amt} required
-                onChange={(e) => setCr({ ...cr, Total_amt: +e.target.value })} tabIndex={9} readOnly />
-
-              <div>
-                <button type='submit' className='bg-green-600 text-gray-300-200'>
+                <button type='submit' className='bg-green-600 text-gray-300-200' tabIndex={10}>
                   <FaSave size={20} /> </button>
 
               </div>
@@ -375,7 +367,7 @@ function Trans() {
         </div>
 
         <DispTranscations data={trans.data} showBtn={true} />
-        {ACTrans && <DispTranscations data={ACTrans} />}
+        {ACTrans && <DispACTranscations data={ACTrans} />}
 
 
         <ToastContainer />
@@ -390,10 +382,19 @@ function Trans() {
 
 }
 
-
+//#region style Components
 const TransStyle = styled.section`
   display: grid;
-  grid-template-columns: 75px  100px 150px repeat(8, 100px) ;
+  grid-template-columns:  75px 150px repeat(8, 100px) ;
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
 `;
 
 
@@ -418,6 +419,7 @@ th {
 td {  
   padding: 2px 5px;
   border: 1px solid gray;
+  text-align: right;
 }
 
 tr.selected {
@@ -426,8 +428,135 @@ tr.selected {
   
 }
 `;
+//#endregion  style Components
 
 function DispTranscations({ data, showBtn = false }) {
+
+  const { transDesc, cr, setCr, setACID, transSummary } = useContext(TranContext)
+
+  const transID = (id) => {
+    try {
+
+      if (transDesc && transDesc.length > 0) {
+        let tr = transDesc.find(item => item.id === id)
+        if (tr.id) return tr.Trans_desc
+      }
+    } catch (error) {
+      // console.log("error");
+      // console.log(transDesc && transDesc.length)
+    }
+
+
+    return id
+  }
+
+
+
+
+  return (
+    <div>
+      <DispTrans >
+        <h3>Transaction</h3>
+        <table>
+          <colgroup>
+            <col span={4} />
+            <col span={4} className='bg-green-300 ' />
+            <col span={4} className='bg-red-300 text-right' />
+          </colgroup>
+          <thead>
+            <tr >
+              {/* <th className='w-1'>id</th> */}
+              <th className='w-1'>BatchNo</th>
+              <th className='w-1'> ACID</th>
+              <th>Trans_des_ID</th>
+              <th>Date</th>
+
+              <th>Cash</th>
+              <th>Chq</th>
+              <th>Adj</th>
+              <th>Amt</th>
+
+              <th>Cash</th>
+              <th>Chq</th>
+              <th>Adj</th>
+              <th>Amt</th>
+
+              <th>PRN</th>
+              <th>INT</th>
+              <th>PRN_B</th>
+              <th>INT_B</th>
+              <th>RATE</th>
+              <th>Days</th>
+              {showBtn && <th>Actions</th>}
+            </tr>
+          </thead>
+          <tbody >
+            {data && data.map((x, i) => (
+              <tr key={i}
+                className={`${(cr && x.id === cr.id ? 'selected' : '')} 
+                      ${x.CB_side == 'R' ? 'text-green-800' : 'text-red-800'}`}>
+                {/* <td>{item.id}</td> */}
+                <td>{i}-{x.ActionID}</td>
+                <td>{x.ACID}</td>
+                <td style={{ textAlign: 'left' }}>{transID(x.Trans_des_ID)}</td>
+                <td className='text-nowrap'>{moment(x.Trans_dt).format('DD-MM-YYYY')}</td>
+
+                <td>{x.CB_side == 'R' ? x.Cash_amt : 0}</td>
+                <td>{x.CB_side == 'R' ? x.Chq_amt : 0}</td>
+                <td>{x.CB_side == 'R' ? x.Adj_amt : 0}</td>
+                <td>{x.CB_side == 'R' ? x.Total_amt : 0}</td>
+
+                <td>{x.CB_side == 'P' ? x.Cash_amt : 0}</td>
+                <td>{x.CB_side == 'P' ? x.Chq_amt : 0}</td>
+                <td>{x.CB_side == 'P' ? x.Adj_amt : 0}</td>
+                <td>{x.CB_side == 'P' ? x.Total_amt : 0}</td>
+
+                <td>{x.PRN}</td>
+                <td>{x.INT}</td>
+                <td>{x.PRN_B}</td>
+                <td>{x.INT_B}</td>
+                <td>{x.rate}</td>
+                <td>{x.Days}</td>
+                {showBtn &&
+                  <td>
+                    <button className='bg-green-500 text-white px-2 py-1'
+                      onClick={() => {
+                        setACID(x.ACID)
+                        setCr(x)
+                      }}
+                    >
+                      <FaEdit />
+                    </button>
+                  </td>
+                }
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={4}>Total</td>
+              <td>{transSummary.Cash_R}</td>
+              <td>{transSummary.Chq_R}</td>
+              <td>{transSummary.Adj_R}</td>
+              <td>{transSummary.receipts}</td>
+
+              <td>{transSummary.Cash_P}</td>
+              <td>{transSummary.Chq_P}</td>
+              <td>{transSummary.Adj_P}</td>
+              <td>{transSummary.payments}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </DispTrans>
+    </div>)
+
+
+
+}
+
+
+
+function DispACTranscations({ data, showBtn = false }) {
 
   const { transDesc, cr, setCr, setACID } = useContext(TranContext)
 
@@ -480,8 +609,8 @@ function DispTranscations({ data, showBtn = false }) {
                 {/* <td>{item.id}</td> */}
                 <td>{i}-{item.ActionID}</td>
                 <td>{item.ACID}</td>
-                <td>{transID(item.Trans_des_ID)}</td>
-                <td>{moment(item.Trans_dt).format('DD-MM-YYYY')}</td>
+                <td style={{ textAlign: 'left' }}>{transID(item.Trans_des_ID)}</td>
+                <td className='text-nowrap'>{moment(item.Trans_dt).format('DD-MM-YYYY')}</td>
                 <td>{item.Total_amt}</td>
                 <td>{item.PRN}</td>
                 <td>{item.INT}</td>

@@ -82,6 +82,7 @@ const MemberData = () => {
         <form onSubmit={handleSubmit} ref={frm} className='grid grid-cols-2 gap-1'>
           <label> ID </label>
           <input type="text" name="id" defaultValue={editPost?.id} readOnly />
+
           <CustomInput disp="Employe Name" name="name" defval={editPost?.name} />
           <CustomInput disp="Designation" name="desgn" defval={editPost?.desgn} />
 

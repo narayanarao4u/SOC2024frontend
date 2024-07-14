@@ -66,7 +66,7 @@ const DisplayData = ({ data, handleDelete, handleEdit, cols, dispcols, filterFun
 
 
       {dispData.map(x => (
-        <DispdataStyle key={x.id} >
+        <DispdataStyle key={x.id} onClick={(() => (showActionBtn == false) && handleEdit(x))} >
 
           {cols.map((f, index) => {
             if (f === 'MEMID') {

@@ -2,13 +2,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export const fetchACs = createAsyncThunk("ACs/fetchACs", async (url) => {
-  console.log('account' , url);
+  console.log("account", url);
   const response = await axios.get(url);
   return response.data;
 });
 
 export const createAC = createAsyncThunk("ACs/createAC", async ({ url, data }) => {
-  const response = await axios.AC(url, data);
+  // console.log(url, data);
+  const response = await axios.post(url, data);
   return response.data;
 });
 
@@ -22,23 +23,22 @@ export const deleteAC = createAsyncThunk("ACs/deleteAC", async ({ url, id }) => 
   return id;
 });
 
-const initialState =  {
+const initialState = {
   data: [],
   status: "idle",
   error: null,
   selected: null,
-
-}
+};
 const accountSlice = createSlice({
   name: "acdata",
   initialState,
   reducers: {
-    selectAC: (state, action) => {      
-      state.selected = action.payload;      
+    selectAC: (state, action) => {
+      state.selected = action.payload;
     },
-    filterACs: (state, action) => {      
+    filterACs: (state, action) => {
       state.data = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,7 +67,5 @@ const accountSlice = createSlice({
       });
   },
 });
-
-
 
 export default accountSlice.reducer;

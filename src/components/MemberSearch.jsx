@@ -5,7 +5,7 @@ import { fetchPosts } from '../redux/memdataSlice';
 
 import DisplayData from './common/DisplayData.jsx';
 
-const MemberSearch = ({ handleEdit, handleDelete }) => {
+const MemberSearch = ({ handleEdit, handleDelete, showActionBtn = true }) => {
   const dispatch = useDispatch();
   const memdata = useSelector(state => state.memdata.members);
   const status = useSelector(state => state.memdata.status);
@@ -48,9 +48,11 @@ const MemberSearch = ({ handleEdit, handleDelete }) => {
 
 
       <DisplayData data={memdata}
+
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         filterFun={filterFun}
+        showActionBtn={showActionBtn}
         dispcols={['GNO', 'Name', 'Designation', 'DOB', 'DOA']}
         cols={['gno', 'name', 'desgn', 'DOB', 'DOA']}
       />

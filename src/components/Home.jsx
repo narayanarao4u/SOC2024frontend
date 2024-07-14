@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components'
 import { fetchTransDescs } from '../redux/transDescSlice';
+import { fetchPosts } from '../redux/memdataSlice';
+import { fetchACs } from '../redux/accountSlice';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -12,10 +14,14 @@ const Home = () => {
 
   const transDesc = useSelector(state => state.transDesc);
 
+
+
   const baseURL = import.meta.env.VITE_APP_BASE_URL;
 
   useEffect(() => {
     dispatch(fetchTransDescs(`${baseURL}/api/transdesc`));
+    dispatch(fetchPosts(`${baseURL}/api/member`));
+    dispatch(fetchACs(`${baseURL}/api/account`));
   }, [])
 
   return (
@@ -35,7 +41,7 @@ const Home = () => {
         <section>
           <h3>Accounts</h3>
           <div>Total Accounts : {acdata.data && acdata?.data.length}</div>
-          <div>Selected Member : {acdata.selected?.name}</div>
+          <div>Selected Member : {acdata.selected?.mem_tb.name}</div>
         </section>
       )}
 
